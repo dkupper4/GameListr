@@ -13,6 +13,8 @@ export const StateContext = ({ children }) => {
   const router = useRouter()
   const { asPath } = useRouter()
 
+  // router.push("/dashboard")
+
   // AUTHENTICATION REMEMBER ME USEEFFECT
   // useEffect(() => {
   //   const unsubscribe = onIdTokenChanged(auth, (user) => {

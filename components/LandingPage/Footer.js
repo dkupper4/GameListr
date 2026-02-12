@@ -1,7 +1,27 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 
 const Footer = () => {
+  const [count,setCount] = useState(0)
+  let number = 0
+  const numb = useRef(0)
+
+  function changeNum(){
+    setCount(count + 1)
+  }
+
+  function changeNumRef(){
+    numb.current ++;
+  }
+
+  useEffect(()=>{
+
+  },[numb.current])
+
+
+
+
   return (
     <FooterSection>
       <FooterContainer>
@@ -17,9 +37,16 @@ const Footer = () => {
           <SocialIcon href="#" aria-label="Instagram">IG</SocialIcon>
         </RightContainer>
       </FooterContainer>
+      <ClickButton onClick={changeNumRef}>click me useRef</ClickButton>
+      <ClickButton onClick={changeNum}>click me</ClickButton>
+      <div>here is the count: {count} here is useRef: {numb.current}</div>
     </FooterSection>
   );
 };
+
+
+const ClickButton = styled.button`
+`;
 
 const FooterSection = styled.footer`
 
