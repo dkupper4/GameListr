@@ -1,17 +1,18 @@
-import React from 'react';
-import styled from 'styled-components';
-import Link from 'next/link'
-import { logOut } from '@/backend/Auth';
-import { useStateContext } from '@/context/StateContext';
-import Home from '@/components/Dashboard/Home'
+import React from "react";
+import styled from "styled-components";
+import Link from "next/link";
+import { logOut } from "@/backend/Auth";
+import { useStateContext } from "@/context/StateContext";
 const Navbar = () => {
-  const { setUser } = useStateContext()
+  const { setUser } = useStateContext();
 
   return (
     <Nav>
-      <Logo onClick={() => logOut(setUser)} href="/">CMPSC 263</Logo>
-      <Home></Home>
+      <Logo onClick={() => logOut(setUser)} href="/">
+        GAMELISTR
+      </Logo>
       <NavLinks>
+        <ButtonLink href="/">My Lists</ButtonLink>
         <ButtonLink href="/auth/signup">Sign Up</ButtonLink>
         <ButtonLink href="/auth/login">Login</ButtonLink>
       </NavLinks>
@@ -20,19 +21,53 @@ const Navbar = () => {
 };
 
 const Nav = styled.nav`
-
+  width: 100%;
+  height: 70px;
+  padding: 0 2rem;
+  background: #000000;
+  font-family: "Chakra Petch", "Trebuchet MS", sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 `;
 
 const Logo = styled(Link)`
+  font-family: "Sora", "Avenir Next", "Trebuchet MS", sans-serif;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: #f8fafc;
+  text-decoration: none;
 
+  &:hover {
+    color: #dae6eb;
+  }
 `;
 
 const NavLinks = styled.div`
-
+  display: flex;
+  gap: 1rem;
 `;
 
 const ButtonLink = styled(Link)`
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  background: #1e293b;
+  color: #f1f5f9;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: 0.2s;
 
+  &:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+  }
 `;
 
 export default Navbar;
