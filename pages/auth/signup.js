@@ -62,7 +62,7 @@ const Signup = () => {
           />
 
           <UserAgreementText>
-            By signing in, you automatically agree to our{" "}
+            By signing up, you automatically agree to our{" "}
             <UserAgreementSpan
               href="/legal/terms-of-use"
               rel="noopener noreferrer"
@@ -141,6 +141,7 @@ const InputTitle = styled.label`
 `;
 
 const MainButton = styled.button`
+  background-color: #8dc0ff;
   font-size: 16px;
   border-radius: 10px;
   height: 40px;
