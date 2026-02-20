@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import Link from "next/link";
 
 const tiers = [
   { rank: "S", color: "#f77982" },
@@ -60,7 +61,7 @@ const buildRandomTierMap = () => {
       tierMap[tier.rank].push(nextCover);
     }
   });
-  
+
   while (shuffled.length > 0) {
     const randomTier = tiers[Math.floor(Math.random() * tiers.length)].rank;
     tierMap[randomTier].push(shuffled.pop());
@@ -89,7 +90,7 @@ const Hero = () => {
             Build a clean, shareable tier list and keep your best picks on top.
           </HeroSubtext>
           <HeroActions>
-            <HeroButton>Start New List</HeroButton>
+            <HeroButtonLink href="/mylists">Start New List</HeroButtonLink>
             <SecondaryButton>View Examples</SecondaryButton>
           </HeroActions>
         </LeftContent>
@@ -282,9 +283,12 @@ const CoverCard = styled.img`
   background: #0b1014;
 `;
 
-const HeroButton = styled.button`
+const HeroButtonLink = styled(Link)`
   min-width: 150px;
   height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   border-radius: 9px;
   padding: 0 1rem;
@@ -293,6 +297,7 @@ const HeroButton = styled.button`
   font-weight: 700;
   color: #0b1624;
   background: linear-gradient(135deg, #8dc6ff 0%, #6daefe 100%);
+  text-decoration: none;
   cursor: pointer;
   transition:
     transform 0.15s ease,
@@ -325,10 +330,5 @@ const SecondaryButton = styled.button`
     background: rgba(16, 25, 35, 0.95);
   }
 `;
-
-
-
-
-
 
 export default Hero;

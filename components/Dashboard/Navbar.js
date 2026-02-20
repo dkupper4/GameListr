@@ -12,7 +12,8 @@ const Navbar = () => {
         GAMELISTR
       </Logo>
       <NavLinks>
-        <ButtonLink href="/">My Lists</ButtonLink>
+        <ButtonLink href="/mylists">New List</ButtonLink>
+        <ButtonLink href="/mylists">My Lists</ButtonLink>
         <ButtonLink href="/auth/signup">Sign Up</ButtonLink>
         <ButtonLink href="/auth/login">Login</ButtonLink>
       </NavLinks>
