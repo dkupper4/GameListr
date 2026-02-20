@@ -57,16 +57,14 @@ const Background = styled.div`
 `;
 
 const TierBox = styled.div`
-  width: 1100px;
+  width: min(1100px, 92vw);
   height: 60vh;
   display: flex;
   flex-direction: column;
-  background: var(--hero-panel);
-  border: 1px solid var(--hero-panel-border);
+  background: rgba(10, 14, 19, 0.84);
+  border: 1px solid rgba(190, 211, 228, 0.14);
   border-radius: 12px;
-  z-index: 2;
   overflow: hidden;
-  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.36);
 
   @media (max-width: 950px) {
     width: 100%;
@@ -105,7 +103,7 @@ const TierLane = styled.div`
 
 const StageContainer = styled.div`
   margin: 1rem 0 1rem;
-  width: 1100px;
+  width: min(1100px, 92vw);
   height: 20vh;
   background: rgba(8, 12, 18, 0.5);
   border: 1px solid rgba(141, 192, 255, 0.16);
