@@ -20,23 +20,22 @@ const Signup = () => {
       return false;
     }
     console.log("so far so good...");
-    const emailResponse = await isEmailInUse(email);
-    console.log("email response", emailResponse);
-    if (emailResponse.length == 0) {
-      return false;
-    }
+    const emailInUse = await isEmailInUse(email);
+    if (emailInUse) return false;
 
     return true;
   }
 
   async function handleSignup() {
     const isValidEmail = await validateEmail();
-    // console.log('isValidEmail', isValidEmail)
-    // if(!isValidEmail){ return; }
+    console.log("isValidEmail", isValidEmail);
+    if (!isValidEmail) {
+      return;
+    }
 
     try {
       await register(email, password, setUser);
-      router.push("/dashboard");
+      router.push("/");
     } catch (err) {
       console.log("Error Signing Up", err);
     }

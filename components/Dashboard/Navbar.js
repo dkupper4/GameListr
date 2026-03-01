@@ -4,18 +4,29 @@ import Link from "next/link";
 import { logOut } from "@/backend/Auth";
 import { useStateContext } from "@/context/StateContext";
 const Navbar = () => {
-  const { setUser } = useStateContext();
+  const { user, setUser, authLoading } = useStateContext();
 
   return (
     <Nav>
-      <Logo onClick={() => logOut(setUser)} href="/">
-        GAMELISTR
-      </Logo>
+      <Logo href={"/"}>GAMELISTR</Logo>
       <NavLinks>
-        <ButtonLink href="/mylists">New List</ButtonLink>
-        <ButtonLink href="/mylists">My Lists</ButtonLink>
-        <ButtonLink href="/auth/signup">Sign Up</ButtonLink>
-        <ButtonLink href="/auth/login">Login</ButtonLink>
+        <ButtonLink href="/newlist">New List</ButtonLink>
+
+        {!authLoading && !user && (
+          <>
+            <ButtonLink href="/auth/signup">Sign Up</ButtonLink>
+            <ButtonLink href="/auth/login">Login</ButtonLink>
+          </>
+        )}
+
+        {!authLoading && user && (
+          <>
+            <ButtonLink href="/mylists">My Lists</ButtonLink>
+            <LogoutButton type="button" onClick={() => logOut(setUser)}>
+              Logout
+            </LogoutButton>
+          </>
+        )}
       </NavLinks>
     </Nav>
   );
@@ -69,6 +80,19 @@ const ButtonLink = styled(Link)`
     background: #f1f5f9;
     color: #0f172a;
   }
+`;
+
+const LogoutButton = styled.button`
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  background: #1e293b;
+  color: #f1f5f9;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
 `;
 
 export default Navbar;

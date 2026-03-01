@@ -20,13 +20,23 @@ import { getAuth } from "firebase/auth";
 //   messagingSenderId: "",
 //   appId: "",
 //   measurementId: ""
-// }
+// }\
 
-// // Initialize Firebase
-// const app = initializeApp(firebaseConfig);
-// export const auth = getAuth(app);
-// export const storage = getStorage(app);
-// export const database = getFirestore(app);
-// export const analytics = () => getAnalytics(app);
+const firebaseConfig = {
+  apiKey: "AIzaSyBe_UpQejhjzyNoGDPtlI6OV0GPR1Pa8To",
+  authDomain: "gamelistr-70e63.firebaseapp.com",
+  projectId: "gamelistr-70e63",
+  storageBucket: "gamelistr-70e63.firebasestorage.app",
+  messagingSenderId: "606698072138",
+  appId: "1:606698072138:web:9065cadb84a430dc631eb3",
+  measurementId: "G-JRF9N1KQHR"
+};
 
-// export default app
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const storage = getStorage(app);
+export const database = getFirestore(app);
+export const analytics = () => getAnalytics(app);
+
+export default app

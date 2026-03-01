@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import { useStateContext } from "@/context/StateContext";
-import { login, isEmailInUse } from "@/backend/Auth";
+import { login } from "@/backend/Auth";
 import Link from "next/link";
 import Navbar from "@/components/Dashboard/Navbar";
 import Footer from "@/components/LandingPage/Footer";
@@ -14,7 +14,14 @@ const Login = () => {
 
   const router = useRouter();
 
-  async function handleLogin() {}
+  async function handleLogin() {
+    try {
+      await login(email, password, setUser);
+      router.push("/mylists");
+    } catch (err) {
+      console.log("Login error:", err.code, err.message);
+    }
+  }
 
   return (
     <>
