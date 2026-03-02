@@ -21,6 +21,7 @@ export default function NewList() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [stagedGames, SetStagedGames] = useState([]);
+  const coverResults = results.filter((g) => g.coverUrl).slice(0, 10);
 
   useEffect(() => {
     if (!query.trim()) {
@@ -51,6 +52,11 @@ export default function NewList() {
       prev.some((g) => g.id === game.id) ? prev : [...prev, game],
     );
   }
+
+  function removeFromStaging(gameId) {
+    SetStagedGames((prev) => prev.filter((g) => g.id !== gameId));
+  }
+
   return (
     <>
       <Navbar />
@@ -64,17 +70,19 @@ export default function NewList() {
           {loading && <StatusText>Searching...</StatusText>}
           {error && <ErrorText>{error}</ErrorText>}
 
-          {results.length > 0 && (
-            <ResultsList>
-              {results.map((game) => (
-                <ResultCard key={game.id}>
-                  <span>{game.name}</span>
-                  <AddBtn type="button" onClick={() => addToStaging(game)}>
-                    Add
-                  </AddBtn>
-                </ResultCard>
+          {coverResults.length > 0 && (
+            <CoverStrip>
+              {coverResults.map((game) => (
+                <CoverButton
+                  key={game.id}
+                  type="button"
+                  title={game.name}
+                  onClick={() => addToStaging(game)}
+                >
+                  <CoverImage src={game.coverUrl} alt={game.name} />
+                </CoverButton>
               ))}
-            </ResultsList>
+            </CoverStrip>
           )}
         </SearchWrap>
         <TierBox>
@@ -87,13 +95,21 @@ export default function NewList() {
         </TierBox>
         <StageContainer>
           {stagedGames.length === 0 ? (
-            <StageText>Click to Add Games to Staging Area</StageText>
+            <StageText>Add Games to Staging Area</StageText>
           ) : (
-            <ResultsList>
-              {stagedGames.map((g) => (
-                <ResultCard key={g.id}>{g.name}</ResultCard>
+            <StageStrip>
+              {stagedGames.map((game) => (
+                <StageCover key={game.id} title={game.name}>
+                  <RemoveBtn
+                    type="button"
+                    onClick={() => removeFromStaging(game.id)}
+                  >
+                    X
+                  </RemoveBtn>
+                  <CoverImage src={game.coverUrl} alt={game.name} />
+                </StageCover>
               ))}
-            </ResultsList>
+            </StageStrip>
           )}
         </StageContainer>
       </Background>
@@ -169,7 +185,7 @@ const TierLane = styled.div`
 const StageContainer = styled.div`
   margin: 1rem 0 1rem;
   width: min(1100px, 92vw);
-  height: 20vh;
+  height: 15vh;
   background: rgba(8, 12, 18, 0.5);
   border: 1px solid rgba(141, 192, 255, 0.16);
   padding: 1.6rem;
@@ -196,13 +212,16 @@ const StageText = styled.h1`
 const SearchWrap = styled.div`
   width: min(1100px, 92vw);
   margin: 0 0 1rem;
+  font-family: "Chakra Petch", "Trebuchet MS", sans-serif;
 `;
 const SearchInput = styled.input`
   width: 100%;
   height: 42px;
   padding: 0 0.8rem;
   border-radius: 8px;
-  border: 1px solid #2e3f53;
+  border: 1px solid;
+  background: #10161d;
+  color: white;
 `;
 const ResultsList = styled.div`
   display: flex;
@@ -232,4 +251,63 @@ const StatusText = styled.p`
 const ErrorText = styled.p`
   color: #f87171;
   margin-top: 0.4rem;
+`;
+
+const CoverStrip = styled.div`
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+`;
+
+const CoverButton = styled.button`
+  flex: 0 0 auto;
+  width: 96px;
+  height: 128px;
+  padding: 0;
+  border: 1px solid rgba(141, 192, 255, 0.25);
+  border-radius: 8px;
+  overflow: hidden;
+  background: transparent;
+  cursor: pointer;
+`;
+
+const CoverImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+`;
+
+const StageStrip = styled.div`
+  display: flex;
+  gap: 0.6rem;
+  overflow-x: auto;
+`;
+
+const StageCover = styled.div`
+  position: relative;
+  flex: 0 0 auto;
+  width: 92px;
+  height: 122px;
+  border: 1px solid rgba(141, 192, 255, 0.25);
+  border-radius: 8px;
+  overflow: hidden;
+`;
+
+const RemoveBtn = styled.button`
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
 `;

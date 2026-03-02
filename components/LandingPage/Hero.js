@@ -90,8 +90,7 @@ const Hero = () => {
             Build a clean, shareable tier list and keep your best picks on top.
           </HeroSubtext>
           <HeroActions>
-            <HeroButtonLink href="/mylists">Start New List</HeroButtonLink>
-            <SecondaryButton>View Examples</SecondaryButton>
+            <HeroButtonLink href="/newlist">Start New List</HeroButtonLink>
           </HeroActions>
         </LeftContent>
 
