@@ -39,6 +39,10 @@ export default function NewList() {
   const [showSaveModal, SetShowSaveModal] = useState(false);
   const [listname, setListname] = useState("");
 
+  const [hltb, setHltb] = useState(null);
+  const [hltbLoading, setHltbLoading] = useState(false);
+  const [hltbError, setHltbError] = useState("");
+
   useEffect(() => {
     if (!query.trim()) {
       setResults([]);
@@ -73,8 +77,21 @@ export default function NewList() {
     setStagedGames((prev) => prev.filter((g) => g.id !== gameId));
   }
 
-  function getGameInfo(game) {
+  async function getGameInfo(game) {
     setSelectedGame(game);
+    setHltb(null);
+    setHltbError("");
+    setHltbLoading(true);
+    try {
+      const r = await fetch(`/api/hltb?q=${encodeURIComponent(game.name)}`);
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || "Failed to load from HLTB");
+      setHltb(j.hltb);
+    } catch (e) {
+      setHltbError(e.message);
+    } finally {
+      setHltbLoading(false);
+    }
   }
 
   function closeGameInfo(game) {
@@ -308,6 +325,21 @@ export default function NewList() {
                   ? selectedGame.platforms.join(", ")
                   : "N/A"}
               </p>
+              {hltbLoading && <p>HowLongToBeat: loading...</p>}
+              {hltbError && <p>HowLongToBeat: {hltbError}</p>}
+              {hltb && (
+                <>
+                  <p>Main Story: {hltb.main ? `${hltb.main}h` : "N/A"}</p>
+                  <p>
+                    Main + Extras:{" "}
+                    {hltb.mainExtra ? `${hltb.mainExtra}h` : "N/A"}
+                  </p>
+                  <p>
+                    Completionist:{" "}
+                    {hltb.completionist ? `${hltb.completionist}h` : "N/A"}
+                  </p>
+                </>
+              )}
             </ModalMeta>
           </ModalCard>
         </ModalBackdrop>
@@ -446,6 +478,7 @@ const SearchInput = styled.input`
   padding: 0 0.8rem;
   border-radius: 8px;
   border: 1px solid;
+  border-color: #10161d;
   background: #10161d;
   color: white;
 `;
