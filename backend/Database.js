@@ -9,6 +9,7 @@ import {
   addDoc,
   serverTimestamp,
   orderBy,
+  deleteDoc,
 } from "firebase/firestore";
 import { database } from "./Firebase";
 
@@ -33,4 +34,16 @@ export async function getUserLists(uid) {
   const q = query(listsRef, orderBy("updatedAt", "desc"));
   const snap = await getDocs(q);
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+export async function getUserList(uid, listId) {
+  const ref = doc(database, "users", uid, "lists", listId);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) throw new Error("List not found");
+  return { id: snap.id, ...snap.data() };
+}
+
+export async function deleteUserList(uid, listId) {
+  const ref = doc(database, "users", uid, "lists", listId);
+  await deleteDoc(ref);
 }
