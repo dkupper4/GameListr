@@ -21,6 +21,12 @@ export default function NewList() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [stagedGames, setStagedGames] = useState([]);
+
+  const [tierGames, setTierGames] = useState(() =>
+    Object.fromEntries(tiers.map((t) => [t.rank, []])),
+  );
+  const [dragItem, setDragItem] = useState(null);
+  const onDragOver = (e) => e.preventDefault();
   const coverResults = results.filter((g) => g.coverUrl).slice(0, 10);
 
   const { user, authLoading } = useStateContext();
@@ -61,6 +67,43 @@ export default function NewList() {
 
   function getGameInfo(gameId) {}
 
+  function stripFromAllTiers(prev, gameId) {
+    const next = {};
+    for (const rank of Object.keys(prev)) {
+      next[rank] = prev[rank].filter((g) => g.id !== gameId);
+    }
+    return next;
+  }
+
+  function onDragStart(game, from) {
+    setDragItem({ game, from });
+  }
+
+  function dropToTier(rank) {
+    if (!dragItem) return;
+    const { game } = dragItem;
+
+    setStagedGames((prev) => prev.filter((g) => g.id !== game.id));
+    setTierGames((prev) => {
+      const next = stripFromAllTiers(prev, game.id);
+      next[rank] = [...next[rank], game];
+      return next;
+    });
+
+    setDragItem(null);
+  }
+
+  function dropToStage() {
+    if (!dragItem) return;
+    const { game } = dragItem;
+    setTierGames((prev) => stripFromAllTiers(prev, game.id));
+    setStagedGames((prev) =>
+      prev.some((g) => g.id === game.id) ? prev : [...prev, game],
+    );
+
+    setDragItem(null);
+  }
+
   return (
     <>
       <Navbar />
@@ -93,20 +136,68 @@ export default function NewList() {
           {tiers.map((tier) => (
             <TierRow key={tier.rank}>
               <TierRank $color={tier.color}>{tier.rank}</TierRank>
-              <TierLane />
+              <TierLane
+                onDragOver={onDragOver}
+                onDrop={() => dropToTier(tier.rank)}
+              >
+                <LaneStrip>
+                  {tierGames[tier.rank].map((game) => (
+                    <TierCover
+                      key={game.id}
+                      title={game.name}
+                      draggable
+                      onDragStart={() =>
+                        onDragStart(game, { type: "tier", rank: tier.rank })
+                      }
+                      onDragEnd={() => setDragItem(null)}
+                    >
+                      <RemoveBtn
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setTierGames((prev) => ({
+                            ...prev,
+                            [tier.rank]: prev[tier.rank].filter(
+                              (g) => g.id !== game.id,
+                            ),
+                          }));
+                        }}
+                      >
+                        X
+                      </RemoveBtn>
+                      <InfoBtn
+                        type="button"
+                        onClick={() => getGameInfo(game.id)}
+                      >
+                        I
+                      </InfoBtn>
+                      <CoverImage src={game.coverUrl} alt={game.name} />
+                    </TierCover>
+                  ))}
+                </LaneStrip>
+              </TierLane>
             </TierRow>
           ))}
         </TierBox>
-        <StageContainer>
+        <StageContainer onDragOver={onDragOver} onDrop={dropToStage}>
           {stagedGames.length === 0 ? (
             <StageText>Add Games to Staging Area</StageText>
           ) : (
             <StageStrip>
               {stagedGames.map((game) => (
-                <StageCover key={game.id} title={game.name}>
+                <StageCover
+                  key={game.id}
+                  title={game.name}
+                  draggable
+                  onDragStart={() => onDragStart(game, { type: "stage" })}
+                  onDragEnd={() => setDragItem(null)}
+                >
                   <RemoveBtn
                     type="button"
-                    onClick={() => removeFromStaging(game.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeFromStaging(game.id);
+                    }}
                   >
                     X
                   </RemoveBtn>
@@ -365,4 +456,22 @@ const InfoBtn = styled.button`
   line-height: 1;
   cursor: pointer;
   z-index: 2;
+`;
+
+const LaneStrip = styled.div`
+  display: flex;
+  gap: 0.6rem;
+  width: 100%;
+  overflow-x: auto;
+`;
+
+const TierCover = styled.div`
+  flex: 0 0 auto;
+  width: 72px;
+  height: 96px;
+  border: 1px solid rgba(141, 192, 255, 0.25);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: grab;
+  position: relative;
 `;
