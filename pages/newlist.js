@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import { useStateContext } from "@/context/StateContext";
@@ -16,6 +16,41 @@ const tiers = [
 ];
 
 export default function NewList() {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [stagedGames, SetStagedGames] = useState([]);
+
+  useEffect(() => {
+    if (!query.trim()) {
+      setResults([]);
+      return;
+    }
+
+    const t = setTimeout(async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const r = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.error || "search failed");
+        setResults(j.games || []);
+      } catch (e) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    }, 350);
+
+    return () => clearTimeout(t);
+  }, [query]);
+
+  function addToStaging(game) {
+    SetStagedGames((prev) =>
+      prev.some((g) => g.id === game.id) ? prev : [...prev, game],
+    );
+  }
   return (
     <>
       <Navbar />

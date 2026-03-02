@@ -10,12 +10,9 @@ async function getAppToken() {
     grant_type: "client_credentials",
   });
 
-  const tokenRes = await fetch(
-    `https://https://id.twitch.tv/oauth2/token?${params}`,
-    {
-      method: "POST",
-    },
-  );
+  const tokenRes = await fetch(`https://id.twitch.tv/oauth2/token?${params}`, {
+    method: "POST",
+  });
 
   if (!tokenRes.ok) {
     const text = await tokenRes.text();
@@ -38,7 +35,7 @@ export default async function handler(req, res) {
 
   try {
     const token = await getAppToken();
-    const safeQ = q.replace(/["\\"]/g, "\\$&");
+    const safeQ = q.replace(/["\\]/g, "\\$&");
 
     const body = `
         search "${safeQ}";
@@ -71,7 +68,7 @@ export default async function handler(req, res) {
         ? `https://images.igdb.com/igdb/image/upload/t_cover_big/${g.cover.image_id}.jpg`
         : null,
       genres: g.genres?.map((x) => x.name) ?? [],
-      platforms: g.platforms?.map((x) => x.name) >> [],
+      platforms: g.platforms?.map((x) => x.name) ?? [],
       rating: g.total_rating ?? null,
       ratingCount: g.total_rating_count ?? 0,
     }));
