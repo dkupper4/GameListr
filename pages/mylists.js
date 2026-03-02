@@ -17,6 +17,8 @@ const MyLists = () => {
   const [listsError, SetListsError] = useState("");
   const [deletingId, setDeletingId] = useState(null);
 
+  const displayName = user?.email?.split("@")[0] || "User";
+
   async function handleDelete(listId) {
     if (!confirm("Delete this list?")) return;
     try {
@@ -65,7 +67,7 @@ const MyLists = () => {
     <>
       <Navbar />
       <Background>
-        <TopHeader>{user.email}'s Lists</TopHeader>
+        <TopHeader>{displayName}'s Lists</TopHeader>
         <ListContainer>
           {listsLoading && <StatusText>Loading your lists...</StatusText>}
           {!listsLoading && listsError && <ErrorText>{listsError}</ErrorText>}
