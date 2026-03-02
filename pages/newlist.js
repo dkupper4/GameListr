@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useStateContext } from "@/context/StateContext";
 import Navbar from "@/components/Dashboard/Navbar";
 import Footer from "@/components/LandingPage/Footer";
+import { saveUserList } from "@/backend/Database";
 
 const tiers = [
   { rank: "S", color: "#f77982" },
@@ -32,6 +33,11 @@ export default function NewList() {
   const [selectedGame, setSelectedGame] = useState(null);
 
   const { user, authLoading } = useStateContext();
+
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [saveError, setSaveError] = useState(false);
+  const [showSaveModal, SetShowSaveModal] = useState(false);
+  const [listname, setListname] = useState("");
 
   useEffect(() => {
     if (!query.trim()) {
@@ -110,6 +116,51 @@ export default function NewList() {
     );
 
     setDragItem(null);
+  }
+
+  async function handleSaveList() {
+    try {
+      setSaveLoading(true);
+      setSaveError("");
+      const cleanTierGames = Object.fromEntries(
+        Object.entries(tierGames).map(([rank, games]) => [
+          rank,
+          games.map((g) => ({
+            id: g.id,
+            name: g.name,
+            coverUrl: g.coverUrl ?? null,
+            releaseDate: g.releaseDate ?? null,
+            rating: g.rating ?? null,
+            genres: g.genres ?? [],
+            platforms: g.platforms ?? [],
+          })),
+        ]),
+      );
+
+      const cleanStagedGames = stagedGames.map((g) => ({
+        id: g.id,
+        name: g.name,
+        coverUrl: g.coverUrl ?? null,
+        releaseDate: g.releaseDate ?? null,
+        rating: g.rating ?? null,
+        genres: g.genres ?? [],
+        platforms: g.platforms ?? [],
+      }));
+
+      await saveUserList({
+        uid: user.uid,
+        name: listname,
+        tierGames: cleanTierGames,
+        stagedGames: cleanStagedGames,
+      });
+
+      SetShowSaveModal(false);
+      setListname("");
+    } catch (err) {
+      setSaveError(err.message || "Failed to save list");
+    } finally {
+      setSaveLoading(false);
+    }
   }
 
   return (
@@ -217,12 +268,13 @@ export default function NewList() {
         </StageContainer>
         {!authLoading && user && (
           <>
-            <SaveBtn>Save List</SaveBtn>
+            <SaveBtn onClick={() => SetShowSaveModal(true)}>Save List</SaveBtn>
           </>
         )}
       </Background>
       <Footer />
 
+      {/* Info modal */}
       {selectedGame && (
         <ModalBackdrop onClick={closeGameInfo}>
           <ModalCard onClick={(e) => e.stopPropagation()}>
@@ -257,6 +309,34 @@ export default function NewList() {
                   : "N/A"}
               </p>
             </ModalMeta>
+          </ModalCard>
+        </ModalBackdrop>
+      )}
+
+      {/* save modal */}
+      {showSaveModal && (
+        <ModalBackdrop onClick={() => SetShowSaveModal(false)}>
+          <ModalCard onClick={(e) => e.stopPropagation()}>
+            <ModalClose type="button" onClick={() => SetShowSaveModal(false)}>
+              X
+            </ModalClose>
+            <ModalTitle> Name your list</ModalTitle>
+            <SaveInput
+              value={listname}
+              onChange={(e) => setListname(e.target.value)}
+              placeholder="My tier list"
+              maxLength={60}
+            />
+
+            <SaveActions>
+              <ModalBtn
+                type="button"
+                disabled={saveLoading || !listname.trim()}
+                onClick={handleSaveList}
+              >
+                {saveLoading ? "Saving..." : "Save"}
+              </ModalBtn>
+            </SaveActions>
           </ModalCard>
         </ModalBackdrop>
       )}
@@ -566,4 +646,29 @@ const ModalTitle = styled.h3`
 const ModalMeta = styled.div`
   font-size: 0.9rem;
   line-height: 1.45;
+`;
+
+const SaveInput = styled.input`
+  width: 100%;
+  height: 40px;
+  margin-top: 0.6rem;
+  padding: 0 0.7rem;
+  border-radius: 8px;
+  border: 1px solid #2e3f53;
+  background: #0f141a;
+  color: #fff;
+`;
+
+const SaveActions = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+`;
+
+const ModalBtn = styled.button`
+  border: none;
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
 `;

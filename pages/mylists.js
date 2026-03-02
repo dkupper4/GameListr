@@ -26,6 +26,7 @@ const MyLists = () => {
         <Navbar></Navbar>
         <Background>
           <TopHeader>Welcome {user?.email} </TopHeader>
+          <ListContainer>content</ListContainer>
         </Background>
         <Footer></Footer>
       </>
@@ -72,6 +73,23 @@ const Background = styled.div`
   align-items: flex-start;
   padding-top: 0.5rem;
   align-items: center;
+`;
+
+const ListContainer = styled.div`
+  margin: 1rem 0 1rem;
+  width: min(1100px, 92vw);
+  height: 70vh;
+  background: rgba(8, 12, 18, 0.5);
+  border: 1px solid rgba(141, 192, 255, 0.16);
+  padding: 1.6rem;
+  border-radius: 14px;
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.28);
+  color: white;
+  display: flex;
+  gap: 0.6rem;
+  flex-direction: column;
+  font-family: "Chakra Petch", "Trebuchet MS", sans-serif;
+  justify-content: center;
 `;
 
 export default MyLists;
