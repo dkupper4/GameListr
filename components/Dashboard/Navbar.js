@@ -11,7 +11,6 @@ const Navbar = () => {
       <Logo href={"/"}>GAMELISTR</Logo>
       <NavLinks>
         <ButtonLink href="/newlist">New List</ButtonLink>
-
         {!authLoading && !user && (
           <>
             <ButtonLink href="/auth/signup">Sign Up</ButtonLink>

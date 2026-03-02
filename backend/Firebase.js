@@ -10,7 +10,7 @@ import { getAuth } from "firebase/auth";
 //   projectId: "",
 //   storageBucket: "",
 //   messagingSenderId: "",
-//   appId: "", 
+//   appId: "",
 //   measurementId: ""
 // } : {
 //   apiKey: "",
@@ -23,13 +23,13 @@ import { getAuth } from "firebase/auth";
 // }\
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBe_UpQejhjzyNoGDPtlI6OV0GPR1Pa8To",
+  apiKey: process.env.API_KEY,
   authDomain: "gamelistr-70e63.firebaseapp.com",
   projectId: "gamelistr-70e63",
   storageBucket: "gamelistr-70e63.firebasestorage.app",
   messagingSenderId: "606698072138",
   appId: "1:606698072138:web:9065cadb84a430dc631eb3",
-  measurementId: "G-JRF9N1KQHR"
+  measurementId: "G-JRF9N1KQHR",
 };
 
 // Initialize Firebase
@@ -39,4 +39,4 @@ export const storage = getStorage(app);
 export const database = getFirestore(app);
 export const analytics = () => getAnalytics(app);
 
-export default app
+export default app;
