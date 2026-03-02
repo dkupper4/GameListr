@@ -55,6 +55,28 @@ export default function NewList() {
     <>
       <Navbar />
       <Background>
+        <SearchWrap>
+          <SearchInput
+            placeholder="Search for a game"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          {loading && <StatusText>Searching...</StatusText>}
+          {error && <ErrorText>{error}</ErrorText>}
+
+          {results.length > 0 && (
+            <ResultsList>
+              {results.map((game) => (
+                <ResultCard key={game.id}>
+                  <span>{game.name}</span>
+                  <AddBtn type="button" onClick={() => addToStaging(game)}>
+                    Add
+                  </AddBtn>
+                </ResultCard>
+              ))}
+            </ResultsList>
+          )}
+        </SearchWrap>
         <TierBox>
           {tiers.map((tier) => (
             <TierRow key={tier.rank}>
@@ -64,7 +86,15 @@ export default function NewList() {
           ))}
         </TierBox>
         <StageContainer>
-          <StageText>Click to Add Games to Staging Area</StageText>
+          {stagedGames.length === 0 ? (
+            <StageText>Click to Add Games to Staging Area</StageText>
+          ) : (
+            <ResultsList>
+              {stagedGames.map((g) => (
+                <ResultCard key={g.id}>{g.name}</ResultCard>
+              ))}
+            </ResultsList>
+          )}
         </StageContainer>
       </Background>
       <Footer />
@@ -161,4 +191,45 @@ const StageText = styled.h1`
     filter: brightness(1.1);
     transform: translateY(-1px);
   }
+`;
+
+const SearchWrap = styled.div`
+  width: min(1100px, 92vw);
+  margin: 0 0 1rem;
+`;
+const SearchInput = styled.input`
+  width: 100%;
+  height: 42px;
+  padding: 0 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #2e3f53;
+`;
+const ResultsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+`;
+const ResultCard = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #10161d;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  color: #fff;
+`;
+const AddBtn = styled.button`
+  border: none;
+  border-radius: 6px;
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+`;
+const StatusText = styled.p`
+  color: #cbd5e1;
+  margin-top: 0.4rem;
+`;
+const ErrorText = styled.p`
+  color: #f87171;
+  margin-top: 0.4rem;
 `;
