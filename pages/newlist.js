@@ -29,6 +29,8 @@ export default function NewList() {
   const onDragOver = (e) => e.preventDefault();
   const coverResults = results.filter((g) => g.coverUrl).slice(0, 10);
 
+  const [selectedGame, setSelectedGame] = useState(null);
+
   const { user, authLoading } = useStateContext();
 
   useEffect(() => {
@@ -65,7 +67,13 @@ export default function NewList() {
     setStagedGames((prev) => prev.filter((g) => g.id !== gameId));
   }
 
-  function getGameInfo(gameId) {}
+  function getGameInfo(game) {
+    setSelectedGame(game);
+  }
+
+  function closeGameInfo(game) {
+    setSelectedGame(null);
+  }
 
   function stripFromAllTiers(prev, gameId) {
     const next = {};
@@ -165,10 +173,7 @@ export default function NewList() {
                       >
                         X
                       </RemoveBtn>
-                      <InfoBtn
-                        type="button"
-                        onClick={() => getGameInfo(game.id)}
-                      >
+                      <InfoBtn type="button" onClick={() => getGameInfo(game)}>
                         I
                       </InfoBtn>
                       <CoverImage src={game.coverUrl} alt={game.name} />
@@ -201,7 +206,7 @@ export default function NewList() {
                   >
                     X
                   </RemoveBtn>
-                  <InfoBtn type="button" onClick={() => getGameInfo(game.id)}>
+                  <InfoBtn type="button" onClick={() => getGameInfo(game)}>
                     I
                   </InfoBtn>
                   <CoverImage src={game.coverUrl} alt={game.name} />
@@ -217,6 +222,44 @@ export default function NewList() {
         )}
       </Background>
       <Footer />
+
+      {selectedGame && (
+        <ModalBackdrop onClick={closeGameInfo}>
+          <ModalCard onClick={(e) => e.stopPropagation()}>
+            <ModalClose type="button" onClick={closeGameInfo}>
+              X
+            </ModalClose>
+            {selectedGame.coverUrl && (
+              <ModalCover src={selectedGame.coverUrl} alt={selectedGame.name} />
+            )}
+            <ModalTitle>{selectedGame.name}</ModalTitle>
+            <ModalMeta>
+              <p>
+                Release:{" "}
+                {selectedGame.releaseDate
+                  ? new Date(selectedGame.releaseDate).toLocaleDateString()
+                  : "Unknown"}
+              </p>
+              <p>
+                Rating:{" "}
+                {selectedGame.rating ? selectedGame.rating.toFixed(1) : "N/A"}
+              </p>
+              <p>
+                Genres:{" "}
+                {selectedGame.genres?.length
+                  ? selectedGame.genres.join(", ")
+                  : "N/A"}
+              </p>
+              <p>
+                Platforms:{" "}
+                {selectedGame.platforms?.length
+                  ? selectedGame.platforms.join(", ")
+                  : "N/A"}
+              </p>
+            </ModalMeta>
+          </ModalCard>
+        </ModalBackdrop>
+      )}
     </>
   );
 }
@@ -474,4 +517,53 @@ const TierCover = styled.div`
   overflow: hidden;
   cursor: grab;
   position: relative;
+`;
+
+const ModalBackdrop = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+`;
+
+const ModalCard = styled.div`
+  position: relative;
+  width: min(360px, 92vw);
+  background: #10161d;
+  border: 1px solid rgba(141, 192, 255, 0.28);
+  border-radius: 12px;
+  padding: 1rem;
+  color: #fff;
+`;
+
+const ModalClose = styled.button`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+`;
+
+const ModalCover = styled.img`
+  width: 92px;
+  height: 122px;
+  border-radius: 8px;
+  object-fit: cover;
+`;
+
+const ModalTitle = styled.h3`
+  margin: 0.7rem 0 0.5rem;
+`;
+
+const ModalMeta = styled.div`
+  font-size: 0.9rem;
+  line-height: 1.45;
 `;
