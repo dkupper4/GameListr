@@ -20,8 +20,10 @@ export default function NewList() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [stagedGames, SetStagedGames] = useState([]);
+  const [stagedGames, setStagedGames] = useState([]);
   const coverResults = results.filter((g) => g.coverUrl).slice(0, 10);
+
+  const { user, authLoading } = useStateContext();
 
   useEffect(() => {
     if (!query.trim()) {
@@ -48,14 +50,16 @@ export default function NewList() {
   }, [query]);
 
   function addToStaging(game) {
-    SetStagedGames((prev) =>
+    setStagedGames((prev) =>
       prev.some((g) => g.id === game.id) ? prev : [...prev, game],
     );
   }
 
   function removeFromStaging(gameId) {
-    SetStagedGames((prev) => prev.filter((g) => g.id !== gameId));
+    setStagedGames((prev) => prev.filter((g) => g.id !== gameId));
   }
+
+  function getGameInfo(gameId) {}
 
   return (
     <>
@@ -106,12 +110,20 @@ export default function NewList() {
                   >
                     X
                   </RemoveBtn>
+                  <InfoBtn type="button" onClick={() => getGameInfo(game.id)}>
+                    I
+                  </InfoBtn>
                   <CoverImage src={game.coverUrl} alt={game.name} />
                 </StageCover>
               ))}
             </StageStrip>
           )}
         </StageContainer>
+        {!authLoading && user && (
+          <>
+            <SaveBtn>Save List</SaveBtn>
+          </>
+        )}
       </Background>
       <Footer />
     </>
@@ -296,10 +308,53 @@ const StageCover = styled.div`
   overflow: hidden;
 `;
 
+const SaveBtn = styled.button`
+  width: min(1100px, 92vw);
+
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 9px;
+  padding: 0 1rem;
+  font-family: "Chakra Petch", "Trebuchet MS", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0b1624;
+  background: linear-gradient(135deg, #8dc6ff 0%, #6daefe 100%);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+  }
+`;
+
 const RemoveBtn = styled.button`
   position: absolute;
   top: 4px;
   right: 4px;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+`;
+
+const InfoBtn = styled.button`
+  position: absolute;
+  top: 4px;
+  left: 4px;
   width: 20px;
   height: 20px;
   border: none;
