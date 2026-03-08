@@ -16,6 +16,16 @@ const tiers = [
   { rank: "F", color: "#74eb83" },
 ];
 
+const CONTENT_WIDTH = "min(1100px, 92vw)";
+const BOARD_WIDTH = "1100px";
+const TIER_LABEL_WIDTH = 96;
+const GAME_CARD_WIDTH = 84;
+const GAME_CARD_HEIGHT = 112;
+const GAME_CARD_GAP = "0.6rem";
+const TIER_VERTICAL_PADDING = "0.55rem";
+const TIER_ROW_MIN_HEIGHT = `calc(${GAME_CARD_HEIGHT}px + 1.1rem)`;
+const STAGE_MIN_HEIGHT = `calc(${GAME_CARD_HEIGHT}px + 4.3rem)`;
+
 export default function NewList() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -208,35 +218,73 @@ export default function NewList() {
             </CoverStrip>
           )}
         </SearchWrap>
-        <TierBox>
-          {tiers.map((tier) => (
-            <TierRow key={tier.rank}>
-              <TierRank $color={tier.color}>{tier.rank}</TierRank>
-              <TierLane
-                onDragOver={onDragOver}
-                onDrop={() => dropToTier(tier.rank)}
-              >
-                <LaneStrip>
-                  {tierGames[tier.rank].map((game) => (
-                    <TierCover
+        <BoardViewport>
+          <BoardStack>
+            <TierBox>
+              {tiers.map((tier) => (
+                <TierRow key={tier.rank}>
+                  <TierRank $color={tier.color}>{tier.rank}</TierRank>
+                  <TierLane
+                    onDragOver={onDragOver}
+                    onDrop={() => dropToTier(tier.rank)}
+                  >
+                    <LaneStrip>
+                      {tierGames[tier.rank].map((game) => (
+                        <TierCover
+                          key={game.id}
+                          title={game.name}
+                          draggable
+                          onDragStart={() =>
+                            onDragStart(game, { type: "tier", rank: tier.rank })
+                          }
+                          onDragEnd={() => setDragItem(null)}
+                        >
+                          <RemoveBtn
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setTierGames((prev) => ({
+                                ...prev,
+                                [tier.rank]: prev[tier.rank].filter(
+                                  (g) => g.id !== game.id,
+                                ),
+                              }));
+                            }}
+                          >
+                            X
+                          </RemoveBtn>
+                          <InfoBtn
+                            type="button"
+                            onClick={() => getGameInfo(game)}
+                          >
+                            I
+                          </InfoBtn>
+                          <CoverImage src={game.coverUrl} alt={game.name} />
+                        </TierCover>
+                      ))}
+                    </LaneStrip>
+                  </TierLane>
+                </TierRow>
+              ))}
+            </TierBox>
+            <StageContainer onDragOver={onDragOver} onDrop={dropToStage}>
+              {stagedGames.length === 0 ? (
+                <StageText>Add Games to Staging Area</StageText>
+              ) : (
+                <StageStrip>
+                  {stagedGames.map((game) => (
+                    <StageCover
                       key={game.id}
                       title={game.name}
                       draggable
-                      onDragStart={() =>
-                        onDragStart(game, { type: "tier", rank: tier.rank })
-                      }
+                      onDragStart={() => onDragStart(game, { type: "stage" })}
                       onDragEnd={() => setDragItem(null)}
                     >
                       <RemoveBtn
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setTierGames((prev) => ({
-                            ...prev,
-                            [tier.rank]: prev[tier.rank].filter(
-                              (g) => g.id !== game.id,
-                            ),
-                          }));
+                          removeFromStaging(game.id);
                         }}
                       >
                         X
@@ -245,49 +293,16 @@ export default function NewList() {
                         I
                       </InfoBtn>
                       <CoverImage src={game.coverUrl} alt={game.name} />
-                    </TierCover>
+                    </StageCover>
                   ))}
-                </LaneStrip>
-              </TierLane>
-            </TierRow>
-          ))}
-        </TierBox>
-        <StageContainer onDragOver={onDragOver} onDrop={dropToStage}>
-          {stagedGames.length === 0 ? (
-            <StageText>Add Games to Staging Area</StageText>
-          ) : (
-            <StageStrip>
-              {stagedGames.map((game) => (
-                <StageCover
-                  key={game.id}
-                  title={game.name}
-                  draggable
-                  onDragStart={() => onDragStart(game, { type: "stage" })}
-                  onDragEnd={() => setDragItem(null)}
-                >
-                  <RemoveBtn
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeFromStaging(game.id);
-                    }}
-                  >
-                    X
-                  </RemoveBtn>
-                  <InfoBtn type="button" onClick={() => getGameInfo(game)}>
-                    I
-                  </InfoBtn>
-                  <CoverImage src={game.coverUrl} alt={game.name} />
-                </StageCover>
-              ))}
-            </StageStrip>
-          )}
-        </StageContainer>
-        {!authLoading && user && (
-          <>
-            <SaveBtn onClick={() => SetShowSaveModal(true)}>Save List</SaveBtn>
-          </>
-        )}
+                </StageStrip>
+              )}
+            </StageContainer>
+            {!authLoading && user && (
+              <SaveBtn onClick={() => SetShowSaveModal(true)}>Save List</SaveBtn>
+            )}
+          </BoardStack>
+        </BoardViewport>
       </Background>
       <Footer />
 
@@ -395,27 +410,33 @@ const Background = styled.div`
   align-items: center;
 `;
 
+const BoardViewport = styled.div`
+  width: ${CONTENT_WIDTH};
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+`;
+
+const BoardStack = styled.div`
+  width: ${BOARD_WIDTH};
+  min-width: ${BOARD_WIDTH};
+  display: flex;
+  flex-direction: column;
+`;
+
 const TierBox = styled.div`
-  width: min(1100px, 92vw);
-  height: 60vh;
+  width: 100%;
   display: flex;
   flex-direction: column;
   background: rgba(10, 14, 19, 0.84);
   border: 1px solid rgba(190, 211, 228, 0.14);
   border-radius: 12px;
   overflow: hidden;
-
-  @media (max-width: 950px) {
-    width: 100%;
-    justify-self: stretch;
-  }
 `;
 
 const TierRow = styled.div`
-  flex: 1;
   display: grid;
-  min-height: 0;
-  grid-template-columns: 100px 1fr;
+  min-height: ${TIER_ROW_MIN_HEIGHT};
+  grid-template-columns: ${TIER_LABEL_WIDTH}px minmax(0, 1fr);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 
   &:last-child {
@@ -436,17 +457,18 @@ const TierRank = styled.div`
 const TierLane = styled.div`
   display: flex;
   align-items: center;
-  padding: 0 0.6rem;
+  min-width: 0;
+  padding: ${TIER_VERTICAL_PADDING} 0.65rem;
   background: linear-gradient(90deg, #0f1419 0%, #141a21 52%, #10151a 100%);
 `;
 
 const StageContainer = styled.div`
   margin: 1rem 0 1rem;
-  width: min(1100px, 92vw);
-  height: 15vh;
+  width: 100%;
+  min-height: ${STAGE_MIN_HEIGHT};
   background: rgba(8, 12, 18, 0.5);
   border: 1px solid rgba(141, 192, 255, 0.16);
-  padding: 1.6rem;
+  padding: 1rem;
   border-radius: 14px;
   box-shadow: 0 20px 42px rgba(0, 0, 0, 0.28);
   color: white;
@@ -454,7 +476,7 @@ const StageContainer = styled.div`
   gap: 0.6rem;
   flex-direction: column;
   font-family: "Chakra Petch", "Trebuchet MS", sans-serif;
-  justify-content: center;
+  justify-content: flex-start;
 `;
 
 const StageText = styled.h1`
@@ -468,7 +490,7 @@ const StageText = styled.h1`
 `;
 
 const SearchWrap = styled.div`
-  width: min(1100px, 92vw);
+  width: ${CONTENT_WIDTH};
   margin: 0 0 1rem;
   font-family: "Chakra Petch", "Trebuchet MS", sans-serif;
 `;
@@ -514,16 +536,16 @@ const ErrorText = styled.p`
 
 const CoverStrip = styled.div`
   display: flex;
-  gap: 0.6rem;
+  gap: ${GAME_CARD_GAP};
   margin-top: 0.6rem;
   overflow-x: auto;
-  padding-bottom: 0.25rem;
+  padding: 0 0 0.25rem;
 `;
 
 const CoverButton = styled.button`
   flex: 0 0 auto;
-  width: 96px;
-  height: 128px;
+  width: ${GAME_CARD_WIDTH}px;
+  height: ${GAME_CARD_HEIGHT}px;
   padding: 0;
   border: 1px solid rgba(141, 192, 255, 0.25);
   border-radius: 8px;
@@ -541,22 +563,26 @@ const CoverImage = styled.img`
 
 const StageStrip = styled.div`
   display: flex;
-  gap: 0.6rem;
+  gap: ${GAME_CARD_GAP};
+  align-items: flex-start;
+  min-height: ${GAME_CARD_HEIGHT}px;
   overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.25rem;
 `;
 
 const StageCover = styled.div`
   position: relative;
   flex: 0 0 auto;
-  width: 92px;
-  height: 122px;
+  width: ${GAME_CARD_WIDTH}px;
+  height: ${GAME_CARD_HEIGHT}px;
   border: 1px solid rgba(141, 192, 255, 0.25);
   border-radius: 8px;
   overflow: hidden;
 `;
 
 const SaveBtn = styled.button`
-  width: min(1100px, 92vw);
+  width: 100%;
 
   height: 44px;
   display: inline-flex;
@@ -616,15 +642,19 @@ const InfoBtn = styled.button`
 
 const LaneStrip = styled.div`
   display: flex;
-  gap: 0.6rem;
+  gap: ${GAME_CARD_GAP};
+  align-items: flex-start;
+  min-height: ${GAME_CARD_HEIGHT}px;
   width: 100%;
   overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.25rem;
 `;
 
 const TierCover = styled.div`
   flex: 0 0 auto;
-  width: 72px;
-  height: 96px;
+  width: ${GAME_CARD_WIDTH}px;
+  height: ${GAME_CARD_HEIGHT}px;
   border: 1px solid rgba(141, 192, 255, 0.25);
   border-radius: 8px;
   overflow: hidden;
@@ -666,8 +696,8 @@ const ModalClose = styled.button`
 `;
 
 const ModalCover = styled.img`
-  width: 92px;
-  height: 122px;
+  width: ${GAME_CARD_WIDTH}px;
+  height: ${GAME_CARD_HEIGHT}px;
   border-radius: 8px;
   object-fit: cover;
 `;

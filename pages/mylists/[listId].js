@@ -16,6 +16,16 @@ const tiers = [
   { rank: "F", color: "#74eb83" },
 ];
 
+const CONTENT_WIDTH = "min(1100px, 92vw)";
+const BOARD_WIDTH = "1100px";
+const TIER_LABEL_WIDTH = 96;
+const GAME_CARD_WIDTH = 84;
+const GAME_CARD_HEIGHT = 112;
+const GAME_CARD_GAP = "0.6rem";
+const TIER_VERTICAL_PADDING = "0.55rem";
+const TIER_ROW_MIN_HEIGHT = `calc(${GAME_CARD_HEIGHT}px + 1.1rem)`;
+const STAGE_MIN_HEIGHT = `calc(${GAME_CARD_HEIGHT}px + 4.3rem)`;
+
 export default function ListDetailPage() {
   const router = useRouter();
   const { listId } = router.query;
@@ -74,13 +84,39 @@ export default function ListDetailPage() {
 
           {!loading && !error && list && (
             <>
-              <TierBox>
-                {tiers.map((tier) => (
-                  <TierRow key={tier.rank}>
-                    <TierRank $color={tier.color}>{tier.rank}</TierRank>
-                    <TierLane>
-                      <LaneStrip>
-                        {(tierGames[tier.rank] || []).map((game) => (
+              <BoardViewport>
+                <BoardStack>
+                  <TierBox>
+                    {tiers.map((tier) => (
+                      <TierRow key={tier.rank}>
+                        <TierRank $color={tier.color}>{tier.rank}</TierRank>
+                        <TierLane>
+                          <LaneStrip>
+                            {(tierGames[tier.rank] || []).map((game) => (
+                              <Cover key={game.id} title={game.name}>
+                                {game.coverUrl ? (
+                                  <CoverImage
+                                    src={game.coverUrl}
+                                    alt={game.name}
+                                  />
+                                ) : (
+                                  <NoCover>{game.name}</NoCover>
+                                )}
+                              </Cover>
+                            ))}
+                          </LaneStrip>
+                        </TierLane>
+                      </TierRow>
+                    ))}
+                  </TierBox>
+
+                  <StageContainer>
+                    <StageLabel>Staging Area</StageLabel>
+                    {stagedGames.length === 0 ? (
+                      <Status>No staged games.</Status>
+                    ) : (
+                      <StageStrip>
+                        {stagedGames.map((game) => (
                           <Cover key={game.id} title={game.name}>
                             {game.coverUrl ? (
                               <CoverImage src={game.coverUrl} alt={game.name} />
@@ -89,30 +125,11 @@ export default function ListDetailPage() {
                             )}
                           </Cover>
                         ))}
-                      </LaneStrip>
-                    </TierLane>
-                  </TierRow>
-                ))}
-              </TierBox>
-
-              <StageContainer>
-                <StageLabel>Staging Area</StageLabel>
-                {stagedGames.length === 0 ? (
-                  <Status>No staged games.</Status>
-                ) : (
-                  <StageStrip>
-                    {stagedGames.map((game) => (
-                      <Cover key={game.id} title={game.name}>
-                        {game.coverUrl ? (
-                          <CoverImage src={game.coverUrl} alt={game.name} />
-                        ) : (
-                          <NoCover>{game.name}</NoCover>
-                        )}
-                      </Cover>
-                    ))}
-                  </StageStrip>
-                )}
-              </StageContainer>
+                      </StageStrip>
+                    )}
+                  </StageContainer>
+                </BoardStack>
+              </BoardViewport>
             </>
           )}
         </Wrap>
@@ -142,10 +159,21 @@ const Background = styled.div`
 `;
 
 const Wrap = styled.div`
-  width: min(1100px, 92vw);
+  width: ${CONTENT_WIDTH};
   margin: 0 auto;
   color: white;
   font-family: "Chakra Petch", "Trebuchet MS", sans-serif;
+`;
+
+const BoardViewport = styled.div`
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+`;
+
+const BoardStack = styled.div`
+  width: ${BOARD_WIDTH};
+  min-width: ${BOARD_WIDTH};
 `;
 
 const HeaderRow = styled.div`
@@ -175,9 +203,9 @@ const TierBox = styled.div`
 `;
 
 const TierRow = styled.div`
-  min-height: 92px;
+  min-height: ${TIER_ROW_MIN_HEIGHT};
   display: grid;
-  grid-template-columns: 70px 1fr;
+  grid-template-columns: ${TIER_LABEL_WIDTH}px minmax(0, 1fr);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 
   &:last-child {
@@ -198,13 +226,18 @@ const TierLane = styled.div`
   background: linear-gradient(90deg, #0f1419 0%, #141a21 52%, #10151a 100%);
   display: flex;
   align-items: center;
-  padding: 0.35rem 0.5rem;
+  min-width: 0;
+  padding: ${TIER_VERTICAL_PADDING} 0.65rem;
 `;
 
 const LaneStrip = styled.div`
   display: flex;
-  gap: 0.5rem;
+  gap: ${GAME_CARD_GAP};
+  align-items: flex-start;
+  min-height: ${GAME_CARD_HEIGHT}px;
   overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.25rem;
   width: 100%;
 `;
 
@@ -213,7 +246,8 @@ const StageContainer = styled.div`
   background: rgba(8, 12, 18, 0.5);
   border: 1px solid rgba(141, 192, 255, 0.16);
   border-radius: 12px;
-  padding: 0.8rem;
+  min-height: ${STAGE_MIN_HEIGHT};
+  padding: 1rem;
 `;
 
 const StageLabel = styled.h2`
@@ -223,14 +257,18 @@ const StageLabel = styled.h2`
 
 const StageStrip = styled.div`
   display: flex;
-  gap: 0.5rem;
+  gap: ${GAME_CARD_GAP};
+  align-items: flex-start;
+  min-height: ${GAME_CARD_HEIGHT}px;
   overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.25rem;
 `;
 
 const Cover = styled.div`
   flex: 0 0 auto;
-  width: 72px;
-  height: 96px;
+  width: ${GAME_CARD_WIDTH}px;
+  height: ${GAME_CARD_HEIGHT}px;
   border: 1px solid rgba(141, 192, 255, 0.25);
   border-radius: 8px;
   overflow: hidden;
