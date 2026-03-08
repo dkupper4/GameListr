@@ -12,19 +12,18 @@ const tiers = [
   { rank: "B", color: "#f5df7c" },
   { rank: "C", color: "#eef57b" },
   { rank: "D", color: "#b0f57d" },
-  { rank: "E", color: "#8bf185" },
   { rank: "F", color: "#74eb83" },
 ];
 
 const CONTENT_WIDTH = "min(1100px, 92vw)";
-const BOARD_WIDTH = "1100px";
-const TIER_LABEL_WIDTH = 96;
-const GAME_CARD_WIDTH = 84;
-const GAME_CARD_HEIGHT = 112;
-const GAME_CARD_GAP = "0.6rem";
-const TIER_VERTICAL_PADDING = "0.55rem";
-const TIER_ROW_MIN_HEIGHT = `calc(${GAME_CARD_HEIGHT}px + 1.1rem)`;
-const STAGE_MIN_HEIGHT = `calc(${GAME_CARD_HEIGHT}px + 4.3rem)`;
+const TIER_LABEL_WIDTH = "clamp(46px, min(8vw, 8vh), 96px)";
+const GAME_CARD_WIDTH = "clamp(40px, min(6.8vw, 7vh), 84px)";
+const GAME_CARD_HEIGHT = `calc((${GAME_CARD_WIDTH}) * 4 / 3)`;
+const GAME_CARD_GAP = "clamp(0.25rem, min(0.8vw, 0.8vh), 0.6rem)";
+const TIER_VERTICAL_PADDING = "clamp(0.22rem, min(0.55vw, 0.6vh), 0.55rem)";
+const STAGE_VERTICAL_PADDING = "clamp(0.75rem, min(1.4vw, 1.6vh), 1rem)";
+const TIER_ROW_MIN_HEIGHT = `calc(${GAME_CARD_HEIGHT} + (${TIER_VERTICAL_PADDING} * 2))`;
+const STAGE_MIN_HEIGHT = `calc(${GAME_CARD_HEIGHT} + (${STAGE_VERTICAL_PADDING} * 2) + 1.5rem)`;
 
 export default function ListDetailPage() {
   const router = useRouter();
@@ -61,7 +60,19 @@ export default function ListDetailPage() {
     };
   }, [authLoading, user?.uid, listId]);
 
-  const tierGames = useMemo(() => list?.tierGames || {}, [list]);
+  const tierGames = useMemo(
+    () =>
+      Object.fromEntries(
+        tiers.map((tier) => [
+          tier.rank,
+          [
+            ...(list?.tierGames?.[tier.rank] || []),
+            ...(tier.rank === "F" ? list?.tierGames?.E || [] : []),
+          ],
+        ]),
+      ),
+    [list],
+  );
   const stagedGames = useMemo(() => list?.stagedGames || [], [list]);
 
   if (authLoading) return <Centered>Checking session...</Centered>;
@@ -167,13 +178,13 @@ const Wrap = styled.div`
 
 const BoardViewport = styled.div`
   width: 100%;
-  overflow-x: auto;
+  max-width: 100%;
   padding-bottom: 0.25rem;
 `;
 
 const BoardStack = styled.div`
-  width: ${BOARD_WIDTH};
-  min-width: ${BOARD_WIDTH};
+  width: 100%;
+  min-width: 0;
 `;
 
 const HeaderRow = styled.div`
@@ -217,6 +228,7 @@ const TierRank = styled.div`
   background: ${(p) => p.$color};
   color: #232323;
   font-weight: 700;
+  font-size: clamp(0.8rem, min(1.5vw, 1.8vh), 1.12rem);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -234,7 +246,7 @@ const LaneStrip = styled.div`
   display: flex;
   gap: ${GAME_CARD_GAP};
   align-items: flex-start;
-  min-height: ${GAME_CARD_HEIGHT}px;
+  min-height: ${GAME_CARD_HEIGHT};
   overflow-x: auto;
   overflow-y: hidden;
   padding-bottom: 0.25rem;
@@ -247,7 +259,7 @@ const StageContainer = styled.div`
   border: 1px solid rgba(141, 192, 255, 0.16);
   border-radius: 12px;
   min-height: ${STAGE_MIN_HEIGHT};
-  padding: 1rem;
+  padding: ${STAGE_VERTICAL_PADDING};
 `;
 
 const StageLabel = styled.h2`
@@ -259,7 +271,7 @@ const StageStrip = styled.div`
   display: flex;
   gap: ${GAME_CARD_GAP};
   align-items: flex-start;
-  min-height: ${GAME_CARD_HEIGHT}px;
+  min-height: ${GAME_CARD_HEIGHT};
   overflow-x: auto;
   overflow-y: hidden;
   padding-bottom: 0.25rem;
@@ -267,8 +279,8 @@ const StageStrip = styled.div`
 
 const Cover = styled.div`
   flex: 0 0 auto;
-  width: ${GAME_CARD_WIDTH}px;
-  height: ${GAME_CARD_HEIGHT}px;
+  width: ${GAME_CARD_WIDTH};
+  height: ${GAME_CARD_HEIGHT};
   border: 1px solid rgba(141, 192, 255, 0.25);
   border-radius: 8px;
   overflow: hidden;
