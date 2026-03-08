@@ -8,6 +8,7 @@ const tiers = [
   { rank: "B", color: "#f5df7c" },
   { rank: "C", color: "#eef57b" },
   { rank: "D", color: "#b0f57d" },
+  { rank: "E", color: "#8bf185" },
   { rank: "F", color: "#74eb83" },
 ];
 

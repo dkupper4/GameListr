@@ -12,18 +12,19 @@ const tiers = [
   { rank: "B", color: "#f5df7c" },
   { rank: "C", color: "#eef57b" },
   { rank: "D", color: "#b0f57d" },
+  { rank: "E", color: "#8bf185" },
   { rank: "F", color: "#74eb83" },
 ];
 
 const CONTENT_WIDTH = "min(1100px, 92vw)";
-const TIER_LABEL_WIDTH = "clamp(46px, min(8vw, 8vh), 96px)";
-const GAME_CARD_WIDTH = "clamp(40px, min(6.8vw, 7vh), 84px)";
-const GAME_CARD_HEIGHT = `calc((${GAME_CARD_WIDTH}) * 4 / 3)`;
-const GAME_CARD_GAP = "clamp(0.25rem, min(0.8vw, 0.8vh), 0.6rem)";
-const TIER_VERTICAL_PADDING = "clamp(0.22rem, min(0.55vw, 0.6vh), 0.55rem)";
-const STAGE_VERTICAL_PADDING = "clamp(0.75rem, min(1.4vw, 1.6vh), 1rem)";
-const TIER_ROW_MIN_HEIGHT = `calc(${GAME_CARD_HEIGHT} + (${TIER_VERTICAL_PADDING} * 2))`;
-const STAGE_MIN_HEIGHT = `calc(${GAME_CARD_HEIGHT} + (${STAGE_VERTICAL_PADDING} * 2) + 1.5rem)`;
+const BOARD_WIDTH = "1100px";
+const TIER_LABEL_WIDTH = 96;
+const GAME_CARD_WIDTH = 84;
+const GAME_CARD_HEIGHT = 112;
+const GAME_CARD_GAP = "0.6rem";
+const TIER_VERTICAL_PADDING = "0.55rem";
+const TIER_ROW_MIN_HEIGHT = `calc(${GAME_CARD_HEIGHT}px + 1.1rem)`;
+const STAGE_MIN_HEIGHT = `calc(${GAME_CARD_HEIGHT}px + 4.3rem)`;
 
 export default function NewList() {
   const [query, setQuery] = useState("");
@@ -400,21 +401,24 @@ const Background = styled.div`
     linear-gradient(90deg, #000 0%, #1a222c 55%, #0f2b47 100%);
   min-height: 90vh;
   width: 100%;
-  padding: 0.75rem 0 2rem;
+  padding: 2.5rem 0;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 0.5rem;
   align-items: center;
 `;
 
 const BoardViewport = styled.div`
   width: ${CONTENT_WIDTH};
-  max-width: 100%;
+  overflow-x: auto;
   padding-bottom: 0.25rem;
 `;
 
 const BoardStack = styled.div`
-  width: 100%;
-  min-width: 0;
+  width: ${BOARD_WIDTH};
+  min-width: ${BOARD_WIDTH};
   display: flex;
   flex-direction: column;
 `;
@@ -444,7 +448,7 @@ const TierRank = styled.div`
   background: ${(props) => props.$color};
   color: #232323;
   font-weight: 700;
-  font-size: clamp(0.8rem, min(1.5vw, 1.8vh), 1.12rem);
+  font-size: 1.12rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -464,19 +468,19 @@ const StageContainer = styled.div`
   min-height: ${STAGE_MIN_HEIGHT};
   background: rgba(8, 12, 18, 0.5);
   border: 1px solid rgba(141, 192, 255, 0.16);
-  padding: ${STAGE_VERTICAL_PADDING};
+  padding: 1rem;
   border-radius: 14px;
   box-shadow: 0 20px 42px rgba(0, 0, 0, 0.28);
   color: white;
   display: flex;
-  gap: clamp(0.45rem, 0.9vh, 0.6rem);
+  gap: 0.6rem;
   flex-direction: column;
   font-family: "Chakra Petch", "Trebuchet MS", sans-serif;
   justify-content: flex-start;
 `;
 
 const StageText = styled.h1`
-  font-size: clamp(1rem, min(3.2vw, 2.8vh), 1.8rem);
+  font-size: 1.8rem;
   text-align: center;
 
   &:hover {
@@ -540,8 +544,8 @@ const CoverStrip = styled.div`
 
 const CoverButton = styled.button`
   flex: 0 0 auto;
-  width: ${GAME_CARD_WIDTH};
-  height: ${GAME_CARD_HEIGHT};
+  width: ${GAME_CARD_WIDTH}px;
+  height: ${GAME_CARD_HEIGHT}px;
   padding: 0;
   border: 1px solid rgba(141, 192, 255, 0.25);
   border-radius: 8px;
@@ -561,7 +565,7 @@ const StageStrip = styled.div`
   display: flex;
   gap: ${GAME_CARD_GAP};
   align-items: flex-start;
-  min-height: ${GAME_CARD_HEIGHT};
+  min-height: ${GAME_CARD_HEIGHT}px;
   overflow-x: auto;
   overflow-y: hidden;
   padding-bottom: 0.25rem;
@@ -570,8 +574,8 @@ const StageStrip = styled.div`
 const StageCover = styled.div`
   position: relative;
   flex: 0 0 auto;
-  width: ${GAME_CARD_WIDTH};
-  height: ${GAME_CARD_HEIGHT};
+  width: ${GAME_CARD_WIDTH}px;
+  height: ${GAME_CARD_HEIGHT}px;
   border: 1px solid rgba(141, 192, 255, 0.25);
   border-radius: 8px;
   overflow: hidden;
@@ -606,15 +610,15 @@ const SaveBtn = styled.button`
 
 const RemoveBtn = styled.button`
   position: absolute;
-  top: clamp(3px, min(0.45vw, 0.45vh), 4px);
-  right: clamp(3px, min(0.45vw, 0.45vh), 4px);
-  width: clamp(16px, min(2.2vw, 2.3vh), 20px);
-  height: clamp(16px, min(2.2vw, 2.3vh), 20px);
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
   border: none;
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.75);
   color: #fff;
-  font-size: clamp(8px, min(0.9vw, 0.95vh), 10px);
+  font-size: 10px;
   line-height: 1;
   cursor: pointer;
   z-index: 2;
@@ -622,15 +626,15 @@ const RemoveBtn = styled.button`
 
 const InfoBtn = styled.button`
   position: absolute;
-  top: clamp(3px, min(0.45vw, 0.45vh), 4px);
-  left: clamp(3px, min(0.45vw, 0.45vh), 4px);
-  width: clamp(16px, min(2.2vw, 2.3vh), 20px);
-  height: clamp(16px, min(2.2vw, 2.3vh), 20px);
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
   border: none;
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.75);
   color: #fff;
-  font-size: clamp(8px, min(0.9vw, 0.95vh), 10px);
+  font-size: 10px;
   line-height: 1;
   cursor: pointer;
   z-index: 2;
@@ -640,7 +644,7 @@ const LaneStrip = styled.div`
   display: flex;
   gap: ${GAME_CARD_GAP};
   align-items: flex-start;
-  min-height: ${GAME_CARD_HEIGHT};
+  min-height: ${GAME_CARD_HEIGHT}px;
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
@@ -649,8 +653,8 @@ const LaneStrip = styled.div`
 
 const TierCover = styled.div`
   flex: 0 0 auto;
-  width: ${GAME_CARD_WIDTH};
-  height: ${GAME_CARD_HEIGHT};
+  width: ${GAME_CARD_WIDTH}px;
+  height: ${GAME_CARD_HEIGHT}px;
   border: 1px solid rgba(141, 192, 255, 0.25);
   border-radius: 8px;
   overflow: hidden;
@@ -692,8 +696,8 @@ const ModalClose = styled.button`
 `;
 
 const ModalCover = styled.img`
-  width: ${GAME_CARD_WIDTH};
-  height: ${GAME_CARD_HEIGHT};
+  width: ${GAME_CARD_WIDTH}px;
+  height: ${GAME_CARD_HEIGHT}px;
   border-radius: 8px;
   object-fit: cover;
 `;
