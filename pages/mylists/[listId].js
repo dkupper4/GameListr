@@ -5,16 +5,7 @@ import Navbar from "@/components/Dashboard/Navbar";
 import Footer from "@/components/LandingPage/Footer";
 import { useStateContext } from "@/context/StateContext";
 import { getUserList } from "@/backend/Database";
-
-const tiers = [
-  { rank: "S", color: "#f77982" },
-  { rank: "A", color: "#f6be7d" },
-  { rank: "B", color: "#f5df7c" },
-  { rank: "C", color: "#eef57b" },
-  { rank: "D", color: "#b0f57d" },
-  { rank: "E", color: "#8bf185" },
-  { rank: "F", color: "#74eb83" },
-];
+import { normalizeTierGames, tiers } from "@/utils/tiers";
 
 const CONTENT_WIDTH = "min(1100px, 92vw)";
 const BOARD_WIDTH = "1100px";
@@ -61,7 +52,10 @@ export default function ListDetailPage() {
     };
   }, [authLoading, user?.uid, listId]);
 
-  const tierGames = useMemo(() => list?.tierGames || {}, [list]);
+  const tierGames = useMemo(
+    () => normalizeTierGames(list?.tierGames),
+    [list?.tierGames],
+  );
   const stagedGames = useMemo(() => list?.stagedGames || [], [list]);
 
   if (authLoading) return <Centered>Checking session...</Centered>;

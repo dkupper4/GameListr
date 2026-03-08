@@ -1,16 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Link from "next/link";
-
-const tiers = [
-  { rank: "S", color: "#f77982" },
-  { rank: "A", color: "#f6be7d" },
-  { rank: "B", color: "#f5df7c" },
-  { rank: "C", color: "#eef57b" },
-  { rank: "D", color: "#b0f57d" },
-  { rank: "E", color: "#8bf185" },
-  { rank: "F", color: "#74eb83" },
-];
+import { createEmptyTierMap, tiers } from "@/utils/tiers";
 
 const coverArtPaths = [
   "/images/co1mws.webp",
@@ -49,11 +40,9 @@ const coverArtPaths = [
   "/images/co8ghf.webp",
 ];
 
-const emptyTierMap = Object.fromEntries(tiers.map((tier) => [tier.rank, []]));
-
 const buildRandomTierMap = () => {
   const shuffled = [...coverArtPaths].sort(() => Math.random() - 0.5);
-  const tierMap = Object.fromEntries(tiers.map((tier) => [tier.rank, []]));
+  const tierMap = createEmptyTierMap();
 
   tiers.forEach((tier) => {
     const nextCover = shuffled.pop();
@@ -71,7 +60,7 @@ const buildRandomTierMap = () => {
 };
 
 const Hero = () => {
-  const [tierCovers, setTierCovers] = useState(emptyTierMap);
+  const [tierCovers, setTierCovers] = useState(() => createEmptyTierMap());
 
   useEffect(() => {
     setTierCovers(buildRandomTierMap());

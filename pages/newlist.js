@@ -5,16 +5,7 @@ import { useStateContext } from "@/context/StateContext";
 import Navbar from "@/components/Dashboard/Navbar";
 import Footer from "@/components/LandingPage/Footer";
 import { saveUserList } from "@/backend/Database";
-
-const tiers = [
-  { rank: "S", color: "#f77982" },
-  { rank: "A", color: "#f6be7d" },
-  { rank: "B", color: "#f5df7c" },
-  { rank: "C", color: "#eef57b" },
-  { rank: "D", color: "#b0f57d" },
-  { rank: "E", color: "#8bf185" },
-  { rank: "F", color: "#74eb83" },
-];
+import { createEmptyTierMap, tiers } from "@/utils/tiers";
 
 const CONTENT_WIDTH = "min(1100px, 92vw)";
 const BOARD_WIDTH = "1100px";
@@ -33,9 +24,7 @@ export default function NewList() {
   const [error, setError] = useState("");
   const [stagedGames, setStagedGames] = useState([]);
 
-  const [tierGames, setTierGames] = useState(() =>
-    Object.fromEntries(tiers.map((t) => [t.rank, []])),
-  );
+  const [tierGames, setTierGames] = useState(() => createEmptyTierMap());
   const [dragItem, setDragItem] = useState(null);
   const onDragOver = (e) => e.preventDefault();
   const coverResults = results.filter((g) => g.coverUrl).slice(0, 10);
@@ -150,9 +139,9 @@ export default function NewList() {
       setSaveLoading(true);
       setSaveError("");
       const cleanTierGames = Object.fromEntries(
-        Object.entries(tierGames).map(([rank, games]) => [
+        tiers.map(({ rank }) => [
           rank,
-          games.map((g) => ({
+          (tierGames[rank] || []).map((g) => ({
             id: g.id,
             name: g.name,
             coverUrl: g.coverUrl ?? null,
